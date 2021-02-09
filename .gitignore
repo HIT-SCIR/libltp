@@ -1,0 +1,11 @@
+/.idea
+/target
+/vocab.txt
+/*.onnx
+Cargo.lock
+!/third/.gitignore
+onnx-*
+ltp.h
+cmake-build-*
+*.class
+.DS_Store

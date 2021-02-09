@@ -1,0 +1,10 @@
+[workspace]
+members = [
+    "ltp-rs",
+    "ltp-cpp",
+    "ltp-java/rust",
+]
+
+exclude = [
+    "ltp-py",
+]

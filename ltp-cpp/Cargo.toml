@@ -1,0 +1,15 @@
+[package]
+name = "ltp4cpp"
+version = "0.1.0"
+authors = ["ylfeng <ylfeng@ir.hit.edu.cn>"]
+edition = "2018"
+
+[lib]
+name = "ltp"
+crate-type = ["cdylib"]
+
+[dependencies]
+ltp-rs = { version = '0.1.0', path = '../ltp-rs', features = ["export"] }
+
+[build-dependencies]
+cbindgen = "0.16"

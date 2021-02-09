@@ -1,0 +1,14 @@
+[package]
+name = "ltp4java"
+version = "0.1.0"
+authors = ["ylfeng <ylfeng@ir.hit.edu.cn>"]
+edition = "2018"
+
+[lib]
+name = "ltp4j"
+crate-type = ["cdylib"]
+
+[dependencies]
+ltp-rs = { version = '0.1.0', path = '../../ltp-rs' }
+jni = { version = "0.18", features = ["invocation"] }
+
