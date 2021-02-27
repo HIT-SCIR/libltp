@@ -11,20 +11,10 @@ use ltp_rs::{
     preinclude::{thiserror::{self, Error}, itertools::Itertools},
 };
 
-#[cfg(feature = "arrow")]
-use ltp_rs::preinclude::arrow::{
-    ffi, error::ArrowError,
-    array::{make_array_from_raw, ArrayRef},
-};
-
-
 /// Error type centralizing all possible errors
 #[non_exhaustive]
 #[derive(Error, Debug)]
 enum PyO3LTPError {
-    #[cfg(feature = "arrow")]
-    #[error("{0}")]
-    ArrowError(ArrowError),
     #[error("{0}")]
     LTPError(LTPError),
 }
@@ -41,13 +31,6 @@ unsafe impl Sync for LTP {}
 impl From<LTPError> for PyO3LTPError {
     fn from(err: LTPError) -> PyO3LTPError {
         PyO3LTPError::LTPError(err)
-    }
-}
-
-#[cfg(feature = "arrow")]
-impl From<ArrowError> for PyO3LTPError {
-    fn from(err: ArrowError) -> PyO3LTPError {
-        PyO3LTPError::ArrowError(err)
     }
 }
 
@@ -138,58 +121,6 @@ impl LTP {
         }
         Ok(list.to_object(py))
     }
-
-    #[cfg(feature = "arrow")]
-    fn pipeline_arrow(&self, py: Python, ob: PyObject) -> PyResult<PyObject> {
-        let array = to_rust(py, ob)?;
-
-        let mut interface_guard = self.interface
-            .lock()
-            .expect("Failed to acquire lock: another thread panicked?");
-
-        let result = interface_guard.pipeline_arrow(array)
-            .map_err(|e| PyO3LTPError::from(e))?;
-
-        let list = PyList::empty(py);
-
-        for array in result {
-            list.append(to_py(py, array)?)?;
-        }
-        Ok(list.to_object(py))
-    }
-}
-
-#[cfg(feature = "arrow")]
-fn to_rust(py: Python, ob: PyObject) -> PyResult<ArrayRef> {
-    // prepare a pointer to receive the Array struct
-    let (array_pointer, schema_pointer) =
-        ffi::ArrowArray::into_raw(unsafe { ffi::ArrowArray::empty() });
-
-    // make the conversion through PyArrow's private API
-    // this changes the pointer's memory and is thus unsafe. In particular, `_export_to_c` can go out of bounds
-    ob.call_method1(
-        py,
-        "_export_to_c",
-        (array_pointer as usize, schema_pointer as usize),
-    )?;
-
-    let array = unsafe { make_array_from_raw(array_pointer, schema_pointer) }
-        .map_err(|e| PyO3LTPError::from(e))?;
-    Ok(array)
-}
-
-#[cfg(feature = "arrow")]
-fn to_py(py: Python, array: ArrayRef) -> PyResult<PyObject> {
-    let (array_pointer, schema_pointer) =
-        array.to_raw().map_err(|e| PyO3LTPError::from(e))?;
-
-    let pa = py.import("pyarrow")?;
-
-    let array = pa.getattr("Array")?.call_method1(
-        "_import_from_c",
-        (array_pointer as usize, schema_pointer as usize),
-    )?;
-    Ok(array.to_object(py))
 }
 
 #[pymodule]

@@ -1,7 +1,7 @@
 [workspace]
 members = [
     "ltp-rs",
-    "ltp-cpp",
+    "ltp-cpp/rust",
     "ltp-java/rust",
 ]
 

@@ -10,20 +10,12 @@ itertools = "0.10"
 thiserror = "1.0"
 num-traits = "0.2"
 lazy_static = "1.4"
-onnxruntime = { git = "https://github.com/AlongWY/onnxruntime-rs.git", branch = "fastgit" }
+onnxruntime = { git = "https://github.com/marshallpierce/onnxruntime-rs.git", branch = "mp/dyn-out-type" }
 # FOR VOCAB
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 
-[dependencies.arrow]
-git = "https://github.com/alongwy/arrow"
-path = "rust"
-rev = "d31c814b0bfa77b9009fc33b48480bfcd250924b"
-version = "4.0.0-SNAPSHOT"
-optional = true
-
 [features]
 default = []
-export = ["arrow"]
 coreml = []
 cuda = []

@@ -18,16 +18,21 @@ pub enum LTPError {
     OrtError(onnxruntime::OrtError),
 
     #[error("{0}")]
-    ShapeError(ndarray::ShapeError),
+    TensorExtractError(onnxruntime::tensor::ort_owned_tensor::TensorExtractError),
 
-    #[cfg(feature = "export")]
     #[error("{0}")]
-    ArrowError(arrow::error::ArrowError),
+    ShapeError(ndarray::ShapeError),
 }
 
 impl From<onnxruntime::OrtError> for LTPError {
     fn from(status: onnxruntime::OrtError) -> Self {
         LTPError::OrtError(status)
+    }
+}
+
+impl From<onnxruntime::tensor::ort_owned_tensor::TensorExtractError> for LTPError {
+    fn from(status: onnxruntime::tensor::ort_owned_tensor::TensorExtractError) -> Self {
+        LTPError::TensorExtractError(status)
     }
 }
 
@@ -46,12 +51,5 @@ impl From<serde_json::Error> for LTPError {
 impl From<std::io::Error> for LTPError {
     fn from(status: std::io::Error) -> Self {
         LTPError::IOError(status)
-    }
-}
-
-#[cfg(feature = "export")]
-impl From<arrow::error::ArrowError> for LTPError {
-    fn from(status: arrow::error::ArrowError) -> Self {
-        LTPError::ArrowError(status)
     }
 }

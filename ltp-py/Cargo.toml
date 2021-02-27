@@ -11,11 +11,3 @@ crate-type = ["cdylib"]
 [dependencies]
 ltp-rs = { version = '0.1.0', path = '../ltp-rs' }
 pyo3 = { version = "0.13", features = ["default", "extension-module"] }
-
-[features]
-default = []
-arrow = ["ltp-rs/export"]
-
-[package.metadata.maturin]
-# todo optional
-requires-dist = ["pyarrow>=1"]

@@ -1,5 +1,3 @@
-#[cfg(feature = "export")]
-pub use arrow;
 pub use itertools;
 pub use onnxruntime;
 

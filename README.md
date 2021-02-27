@@ -32,7 +32,4 @@ gradle build
 ```shell
 cd ltp-py
 maturin build -i python3
-
-# with apache arrow support
-maturin build -i python3 --cargo-extra-args="--features=arrow" 
 ```

@@ -2,7 +2,7 @@ use ltp_rs::preinclude::serde_json;
 use ltp_rs::{LTP, LTPError};
 
 fn main() -> Result<(), LTPError> {
-    let path = String::from("../onnx-small");
+    let path = String::from("onnx-small");
     let mut ltp = LTP::new(&path)?;
 
     let sentence = String::from("他叫汤姆去拿外衣。");
