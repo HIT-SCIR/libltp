@@ -7,7 +7,11 @@ else ()
 endif ()
 
 if (ENABLE_LTO)
-    set(RUST_FLAGS "-Clinker-plugin-lto" "-Clinker=clang" "-Clink-arg=-fuse-ld=lld")
+    if (APPLE)
+        set(RUSTFLAGS "-Clinker-plugin-lto")
+    else ()
+        set(RUSTFLAGS "-Clinker-plugin-lto" "-Clinker=clang" "-Clink-arg=-fuse-ld=lld")
+    endif ()
 endif ()
 
 execute_process(
@@ -31,7 +35,7 @@ set(RUST_PART_HED "${CMAKE_CURRENT_BINARY_DIR}/ltp.h")
 add_library(ltp STATIC ${RUST_PART_CXX} ${RUST_PART_HED})
 add_custom_command(
         OUTPUT ${RUST_PART_CXX} ${RUST_PART_HED} ${RUST_PART_LIB}
-        COMMAND ${CARGO_CMD}
+        COMMAND ${CMAKE_COMMAND} -E env RUSTFLAGS=${RUST_FLAGS} ${CARGO_CMD}
         COMMAND cp ${CARGO_PROJECT_TOP}/target/cxxbridge/ltp4cpp/src/lib.rs.h ${RUST_PART_HED}
         COMMAND cp ${CARGO_PROJECT_TOP}/target/cxxbridge/ltp4cpp/src/lib.rs.cc ${RUST_PART_CXX}
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}

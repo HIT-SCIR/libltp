@@ -11,12 +11,13 @@
 
 ```shell
 cd ltp-cpp
-cargo build --release
 mkdir build && cd build
-cmake ../example && make
+cmake -DENABLE_LTO=ON -DCMAKE_BUILD_TYPE=Release ..
+make
 ```
 
 ### todo
+
 + [ ] use native class instead of arrow
 
 ## Java
