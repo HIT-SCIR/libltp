@@ -1,5 +1,5 @@
 use cxx::CxxString;
-use ltp_rs::{LTP, LTPResult};
+use ltp_rs::{LTP, LTPResult, Result};
 
 pub struct Interface(LTP);
 
@@ -12,7 +12,7 @@ mod ffi {
         type Interface;
         type InterfaceResult;
 
-        fn ltp_init(path: &CxxString) -> Box<Interface>;
+        fn ltp_init(path: &CxxString) -> Result<Box<Interface>>;
         fn pipeline(self: &mut Interface, sentences: &Vec<String>) -> Vec<InterfaceResult>;
 
         fn len(self: &InterfaceResult) -> usize;
@@ -31,8 +31,8 @@ mod ffi {
     }
 }
 
-fn ltp_init(path: &CxxString) -> Box<Interface> {
-    return Box::new(Interface(LTP::new(&path.to_string()).unwrap()));
+fn ltp_init(path: &CxxString) -> Result<Box<Interface>> {
+    return Ok(Box::new(Interface(LTP::new(&path.to_string())?)));
 }
 
 impl Interface {

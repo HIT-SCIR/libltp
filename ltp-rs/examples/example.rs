@@ -1,6 +1,9 @@
 use ltp_rs::preinclude::serde_json;
 use ltp_rs::{LTP, LTPError};
 
+// todo argparse (use clap)
+// todo ensure input/output format
+
 fn main() -> Result<(), LTPError> {
     let path = String::from("onnx-small");
     let mut ltp = LTP::new(&path)?;
