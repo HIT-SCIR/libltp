@@ -120,6 +120,7 @@ impl LTP {
         Ok(LTP { vocabs, tokenizer, session })
     }
 
+    // todo: code is too long, need to split and refactor to support different models
     pub fn pipeline_batch(&mut self, sentences: &Vec<String>) -> Result<Vec<LTPResult>> {
         let inputs = sentences.iter().map(
             |s| EncodeInput::Single(s.to_string())
