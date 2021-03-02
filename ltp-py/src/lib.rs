@@ -1,14 +1,21 @@
 use std::sync::{Arc, Mutex};
 
 use pyo3::{
-    prelude::*,
     exceptions::PyOSError,
-    types::{PyUnicode, PyList, PyDict},
+    prelude::*,
+    types::{PyDict, PyList, PyUnicode},
+    wrap_pyfunction,
 };
 
 use ltp_rs::{
-    LTP as Interface, LTPError,
-    preinclude::{thiserror::{self, Error}, itertools::Itertools},
+    eisner::eisner,
+    entities::get_entities,
+    preinclude::{
+        itertools::Itertools,
+        thiserror::{self, Error},
+    },
+    viterbi::viterbi_decode_postprocess,
+    LTPError, LTP as Interface,
 };
 
 /// Error type centralizing all possible errors
@@ -44,20 +51,24 @@ impl From<PyO3LTPError> for PyErr {
 impl LTP {
     #[new]
     fn new(path: &PyUnicode) -> PyResult<Self> {
-        let interface = Interface::new(&path.to_string())
-            .map_err(|e| PyO3LTPError::from(LTPError::from(e)))?;
-        Ok(LTP { interface: Arc::new(Mutex::new(interface)) })
+        let interface =
+            Interface::new(&path.to_string()).map_err(|e| PyO3LTPError::from(LTPError::from(e)))?;
+        Ok(LTP {
+            interface: Arc::new(Mutex::new(interface)),
+        })
     }
 
     fn pipeline(&self, py: Python, ob: PyObject) -> PyResult<PyObject> {
         let ob: &PyList = ob.cast_as(py)?;
         let array = ob.iter().map(|x| x.to_string()).collect_vec();
 
-        let mut interface_guard = self.interface
+        let mut interface_guard = self
+            .interface
             .lock()
             .expect("Failed to acquire lock: another thread panicked?");
 
-        let results = interface_guard.pipeline_batch(&array)
+        let results = interface_guard
+            .pipeline_batch(&array)
             .map_err(|e| PyO3LTPError::from(e))?;
 
         let list = PyList::empty(py);
@@ -123,8 +134,36 @@ impl LTP {
     }
 }
 
+#[pyfunction]
+fn py_get_entities<'a>(tags: Vec<&'a str>) -> PyResult<Vec<(&'a str, usize, usize)>> {
+    Ok(get_entities(tags))
+}
+
+#[pyfunction]
+fn py_eisner(scores: Vec<f32>, stn_length: Vec<usize>) -> PyResult<Vec<Vec<usize>>> {
+    Ok(eisner(scores.as_slice(), stn_length.as_slice(), true))
+}
+
+#[pyfunction]
+fn py_viterbi_decode_postprocess(
+    history: Vec<i64>,
+    last_tags: Vec<i64>,
+    stn_lengths: Vec<usize>,
+    label_num: usize,
+) -> PyResult<Vec<Vec<i64>>> {
+    Ok(viterbi_decode_postprocess(
+        history.as_slice(),
+        last_tags.as_slice(),
+        &stn_lengths,
+        label_num,
+    ))
+}
+
 #[pymodule]
 fn pyltp(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_class::<LTP>()?;
+    m.add_function(wrap_pyfunction!(py_eisner, m)?)?;
+    m.add_function(wrap_pyfunction!(py_get_entities, m)?)?;
+    m.add_function(wrap_pyfunction!(py_viterbi_decode_postprocess, m)?)?;
     Ok(())
 }

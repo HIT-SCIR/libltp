@@ -1,8 +1,8 @@
+use crate::error::Result;
 use serde::{Deserialize, Serialize};
 use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
-use crate::error::Result;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Vocab {
@@ -29,7 +29,6 @@ mod tests {
     use crate::vocabs::Vocab;
     use std::fs::File;
     use std::io::BufReader;
-
 
     #[test]
     fn test_vocab() {

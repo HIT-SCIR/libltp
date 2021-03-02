@@ -1,5 +1,6 @@
+use crate::preinclude::onnxruntime::ndarray;
+use crate::preinclude::onnxruntime::tensor::ort_owned_tensor::TensorExtractError;
 use thiserror::Error;
-use onnxruntime::ndarray;
 
 /// Type alias for the `Result`
 pub type Result<T> = std::result::Result<T, LTPError>;
@@ -18,7 +19,7 @@ pub enum LTPError {
     OrtError(onnxruntime::OrtError),
 
     #[error("{0}")]
-    TensorExtractError(onnxruntime::tensor::ort_owned_tensor::TensorExtractError),
+    TensorExtractError(TensorExtractError),
 
     #[error("{0}")]
     ShapeError(ndarray::ShapeError),
@@ -30,8 +31,8 @@ impl From<onnxruntime::OrtError> for LTPError {
     }
 }
 
-impl From<onnxruntime::tensor::ort_owned_tensor::TensorExtractError> for LTPError {
-    fn from(status: onnxruntime::tensor::ort_owned_tensor::TensorExtractError) -> Self {
+impl From<TensorExtractError> for LTPError {
+    fn from(status: TensorExtractError) -> Self {
         LTPError::TensorExtractError(status)
     }
 }

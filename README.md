@@ -16,10 +16,6 @@ cmake -DENABLE_LTO=ON -DCMAKE_BUILD_TYPE=Release ..
 make
 ```
 
-### todo
-
-+ [ ] use native class instead of arrow
-
 ## Java
 
 ```shell
@@ -34,3 +30,9 @@ gradle build
 cd ltp-py
 maturin build -i python3
 ```
+
+## TODO
++ [] 可选任务
++ [] 语言词语对齐
++ [] 其他语言支持 cuda
++ [] 自动下载模型

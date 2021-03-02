@@ -4,18 +4,27 @@ version = "0.1.0"
 authors = ["ylfeng <ylfeng@ir.hit.edu.cn>"]
 edition = "2018"
 
+[[example]]
+name = "example"
+
 [dependencies]
 tokenizers = "0.10"
 itertools = "0.10"
 thiserror = "1.0"
 num-traits = "0.2"
 lazy_static = "1.4"
-onnxruntime = { git = "https://github.com/marshallpierce/onnxruntime-rs.git", branch = "mp/dyn-out-type" }
+onnxruntime = { version = "0.0.11", features = ["generate-bindings"] }
 # FOR VOCAB
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 
+[dev-dependencies]
+clap = "3.0.0-beta.2"
+indicatif = "0.15"
+ndarray = "0.14.0"
+ndarray-npy = { version = "0.7", features = ["npz"] }
+
 [features]
 default = []
 coreml = []
-cuda = []
+cuda = ["onnxruntime/cuda"]

@@ -1,11 +1,21 @@
+# idea
 /.idea
-/target
-/vocab.txt
-/*.onnx
-Cargo.lock
-!/third/.gitignore
-onnx-*
-ltp.h
-cmake-build-*
-*.class
+
+# macos
 .DS_Store
+
+# models
+/models
+*.onnx
+vocab.txt
+vocab.json
+
+# rust
+/target
+Cargo.lock
+
+# C/C++
+/cmake-build-*
+
+# java
+*.class

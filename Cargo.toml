@@ -3,8 +3,9 @@ members = [
     "ltp-rs",
     "ltp-cpp/rust",
     "ltp-java/rust",
-]
-
-exclude = [
     "ltp-py",
 ]
+
+
+[patch.crates-io]
+onnxruntime = { git = "https://github.com/AlongWY/onnxruntime-rs.git", branch = "al/dyn+cuda" }

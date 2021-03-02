@@ -1,9 +1,9 @@
-pub use tokenizers::tokenizer::{Tokenizer};
-use tokenizers::tokenizer::{Model, PaddingParams, PaddingStrategy, PaddingDirection};
 use tokenizers::models::wordpiece::WordPiece;
+use tokenizers::normalizers::bert::BertNormalizer;
 use tokenizers::pre_tokenizers::bert::BertPreTokenizer;
 use tokenizers::processors::bert::BertProcessing;
-use tokenizers::normalizers::bert::BertNormalizer;
+pub use tokenizers::tokenizer::Tokenizer;
+use tokenizers::tokenizer::{Model, PaddingDirection, PaddingParams, PaddingStrategy};
 
 pub struct LTPTokenizer;
 
@@ -46,7 +46,7 @@ impl LTPTokenizer {
 
 #[cfg(test)]
 mod tests {
-    use crate::tokenizer::{LTPTokenizer};
+    use crate::tokenizer::LTPTokenizer;
     use tokenizers::tokenizer::EncodeInput;
 
     #[test]
@@ -65,7 +65,7 @@ mod tests {
 
         let input = vec![
             EncodeInput::Single(String::from("他叫汤姆去拿外衣！")),
-            EncodeInput::Single(String::from("我爱中国"))
+            EncodeInput::Single(String::from("我爱中国")),
         ];
 
         let encodings = tokenizer.encode_batch(input, true).unwrap();

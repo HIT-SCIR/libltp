@@ -1,13 +1,13 @@
 use jni::{
-    JNIEnv,
-    sys::{jlong, jobject},
     errors::Error as JNIError,
-    objects::{JClass, JString, JList, JObject},
+    objects::{JClass, JList, JObject, JString},
+    sys::{jlong, jobject},
+    JNIEnv,
 };
 
 use ltp_rs::{
-    LTP as Interface, LTPError,
     preinclude::thiserror::{self, Error},
+    LTPError, LTP as Interface,
 };
 
 /// Error type centralizing all possible errors
@@ -34,7 +34,10 @@ impl From<JNIError> for JniLTPError {
     }
 }
 
-fn new_java_list<'a, 'b>(env: &'a JNIEnv) -> Result<JList<'a, 'b>> where 'a: 'b {
+fn new_java_list<'a, 'b>(env: &'a JNIEnv) -> Result<JList<'a, 'b>>
+where
+    'a: 'b,
+{
     let jclass = env.find_class("java/util/ArrayList")?;
     let jobject = env.new_object(jclass, "()V", &[])?;
     let result = JList::from_env(&env, jobject)?;
@@ -47,8 +50,12 @@ fn ltp_rust_init(env: JNIEnv, _class: JClass, path: JString) -> Result<jlong> {
     Ok(Box::into_raw(interface) as jlong)
 }
 
-
-fn ltp_rust_pipeline(env: JNIEnv, _class: JClass, ptr: jlong, sentences: JObject) -> Result<jobject> {
+fn ltp_rust_pipeline(
+    env: JNIEnv,
+    _class: JClass,
+    ptr: jlong,
+    sentences: JObject,
+) -> Result<jobject> {
     let sentences = JList::from_env(&env, sentences)?;
     let length = sentences.size()?.into();
     let mut batch_sentences = Vec::new();
@@ -108,7 +115,6 @@ fn ltp_rust_pipeline(env: JNIEnv, _class: JClass, ptr: jlong, sentences: JObject
         }
         java_one_list.add(JObject::from(srl))?;
 
-
         let dep = new_java_list(&env)?;
         if result.dep.is_some() {
             for tag in result.dep.unwrap() {
@@ -120,7 +126,10 @@ fn ltp_rust_pipeline(env: JNIEnv, _class: JClass, ptr: jlong, sentences: JObject
         let sdp = new_java_list(&env)?;
         if result.sdp.is_some() {
             for tag in result.sdp.unwrap() {
-                sdp.add(env.new_string(format!("{}:{}:{}", tag.src, tag.tgt, tag.rel))?.into())?;
+                sdp.add(
+                    env.new_string(format!("{}:{}:{}", tag.src, tag.tgt, tag.rel))?
+                        .into(),
+                )?;
             }
         }
         java_one_list.add(JObject::from(sdp))?;
@@ -132,7 +141,11 @@ fn ltp_rust_pipeline(env: JNIEnv, _class: JClass, ptr: jlong, sentences: JObject
 }
 
 #[no_mangle]
-pub extern "system" fn Java_cn_edu_hit_ir_LTP_rust_1init(env: JNIEnv, _class: JClass, path: JString) -> jlong {
+pub extern "system" fn Java_cn_edu_hit_ir_LTP_rust_1init(
+    env: JNIEnv,
+    _class: JClass,
+    path: JString,
+) -> jlong {
     let result = ltp_rust_init(env, _class, path);
 
     match result {
@@ -146,12 +159,19 @@ pub extern "system" fn Java_cn_edu_hit_ir_LTP_rust_1init(env: JNIEnv, _class: JC
 }
 
 #[no_mangle]
-pub extern "system" fn Java_cn_edu_hit_ir_LTP_rust_1release(env: JNIEnv, _class: JClass, ptr: jlong) {
+pub extern "system" fn Java_cn_edu_hit_ir_LTP_rust_1release(
+    env: JNIEnv,
+    _class: JClass,
+    ptr: jlong,
+) {
     unsafe {
         let ptr = ptr as *mut Interface;
         if ptr.is_null() {
-            env.throw_new("java/lang/NullPointerException", "release null native ltp pointer")
-                .expect("jni native error!");
+            env.throw_new(
+                "java/lang/NullPointerException",
+                "release null native ltp pointer",
+            )
+            .expect("jni native error!");
         } else {
             Box::from_raw(ptr);
         }
@@ -159,7 +179,12 @@ pub extern "system" fn Java_cn_edu_hit_ir_LTP_rust_1release(env: JNIEnv, _class:
 }
 
 #[no_mangle]
-pub extern "system" fn Java_cn_edu_hit_ir_LTP_rust_1pipeline(env: JNIEnv, _class: JClass, ptr: jlong, sentences: JObject) -> jobject {
+pub extern "system" fn Java_cn_edu_hit_ir_LTP_rust_1pipeline(
+    env: JNIEnv,
+    _class: JClass,
+    ptr: jlong,
+    sentences: JObject,
+) -> jobject {
     let result = ltp_rust_pipeline(env, _class, ptr, sentences);
     match result {
         Ok(res) => res,
@@ -171,12 +196,14 @@ pub extern "system" fn Java_cn_edu_hit_ir_LTP_rust_1pipeline(env: JNIEnv, _class
     }
 }
 
-
 #[cfg(test)]
 mod tests {
-    use crate::{Java_cn_edu_hit_ir_LTP_rust_1pipeline, Java_cn_edu_hit_ir_LTP_rust_1init, Java_cn_edu_hit_ir_LTP_rust_1release};
-    use jni::{JavaVM, InitArgsBuilder, JNIVersion, errors::Result as JNIResult};
+    use crate::{
+        Java_cn_edu_hit_ir_LTP_rust_1init, Java_cn_edu_hit_ir_LTP_rust_1pipeline,
+        Java_cn_edu_hit_ir_LTP_rust_1release,
+    };
     use jni::objects::{JList, JObject};
+    use jni::{errors::Result as JNIResult, InitArgsBuilder, JNIVersion, JavaVM};
 
     #[test]
     fn test_display() -> JNIResult<()> {
@@ -205,7 +232,9 @@ mod tests {
         let jobject = env.new_object(jclass, "()V", &[])?;
         let jlist = JList::from_env(&env, jobject)?;
         let jstring = env.new_string("他叫汤姆去拿外衣")?;
-        jlist.add(JObject::from(jstring)).expect("list add object error");
+        jlist
+            .add(JObject::from(jstring))
+            .expect("list add object error");
 
         let jstring = env.new_string("../../onnx-small")?;
         let ptr = Java_cn_edu_hit_ir_LTP_rust_1init(env, jclass, jstring);

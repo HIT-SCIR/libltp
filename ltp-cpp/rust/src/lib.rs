@@ -1,10 +1,9 @@
 use cxx::CxxString;
-use ltp_rs::{LTP, LTPResult, Result};
+use ltp_rs::{LTPResult, Result, LTP};
 
 pub struct Interface(LTP);
 
 pub struct InterfaceResult(LTPResult);
-
 
 #[cxx::bridge]
 mod ffi {
@@ -53,26 +52,46 @@ impl Interface {
 }
 
 impl InterfaceResult {
-    pub fn len(&self) -> usize { self.0.seg.as_ref().unwrap().len() }
-    pub fn seg(&self) -> &Vec<String> { self.0.seg.as_ref().unwrap() }
-    pub fn pos(&self) -> &Vec<String> { self.0.pos.as_ref().unwrap() }
-    pub fn ner(&self) -> &Vec<String> { self.0.ner.as_ref().unwrap() }
+    pub fn len(&self) -> usize {
+        self.0.seg.as_ref().unwrap().len()
+    }
+    pub fn seg(&self) -> &Vec<String> {
+        self.0.seg.as_ref().unwrap()
+    }
+    pub fn pos(&self) -> &Vec<String> {
+        self.0.pos.as_ref().unwrap()
+    }
+    pub fn ner(&self) -> &Vec<String> {
+        self.0.ner.as_ref().unwrap()
+    }
     pub fn srl(&self, idx: usize) -> &Vec<String> {
         self.0.srl.as_ref().unwrap()[idx].as_ref()
     }
-    pub fn dep_arc(&self, idx: usize) -> usize { self.0.dep.as_ref().unwrap()[idx].arc }
-    pub fn dep_rel(&self, idx: usize) -> &String { &self.0.dep.as_ref().unwrap()[idx].rel }
+    pub fn dep_arc(&self, idx: usize) -> usize {
+        self.0.dep.as_ref().unwrap()[idx].arc
+    }
+    pub fn dep_rel(&self, idx: usize) -> &String {
+        &self.0.dep.as_ref().unwrap()[idx].rel
+    }
 
-    pub fn sdp_len(&self) -> usize { self.0.seg.as_ref().unwrap().len() }
-    pub fn sdp_src(&self, idx: usize) -> usize { self.0.sdp.as_ref().unwrap()[idx].src }
-    pub fn sdp_tgt(&self, idx: usize) -> usize { self.0.sdp.as_ref().unwrap()[idx].tgt }
-    pub fn sdp_rel(&self, idx: usize) -> &String { &self.0.sdp.as_ref().unwrap()[idx].rel }
+    pub fn sdp_len(&self) -> usize {
+        self.0.seg.as_ref().unwrap().len()
+    }
+    pub fn sdp_src(&self, idx: usize) -> usize {
+        self.0.sdp.as_ref().unwrap()[idx].src
+    }
+    pub fn sdp_tgt(&self, idx: usize) -> usize {
+        self.0.sdp.as_ref().unwrap()[idx].tgt
+    }
+    pub fn sdp_rel(&self, idx: usize) -> &String {
+        &self.0.sdp.as_ref().unwrap()[idx].rel
+    }
 }
 
 #[cfg(test)]
 mod tests {
-    use cxx::let_cxx_string;
     use crate::ltp_init;
+    use cxx::let_cxx_string;
 
     #[test]
     fn test_interface() {

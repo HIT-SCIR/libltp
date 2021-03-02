@@ -2,15 +2,15 @@ pub mod preinclude;
 
 mod error;
 
-mod eisner;
-mod entities;
-mod viterbi;
+pub mod eisner;
+pub mod entities;
+pub mod viterbi;
 
-mod vocabs;
 mod tokenizer;
+mod vocabs;
 
 mod interface;
 
-pub use error::Result;
 pub use error::LTPError;
-pub use interface::{LTP, LTPResult, DEP, SDP};
+pub use error::Result;
+pub use interface::{LTPResult, DEP, LTP, SDP};
