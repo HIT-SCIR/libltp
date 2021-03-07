@@ -11,9 +11,15 @@ mod ffi {
         type Interface;
         type InterfaceResult;
 
-        fn ltp_init(path: &CxxString) -> Result<Box<Interface>>;
-        fn pipeline(self: &mut Interface, sentences: &Vec<String>) -> Vec<InterfaceResult>;
+        fn ltp_init(path: &CxxString, num_threads: i32) -> Result<Box<Interface>>;
+        #[cfg(feature = "cuda")]
+        fn ltp_init_cuda(
+            path: &CxxString,
+            num_threads: i32,
+            device_id: i32,
+        ) -> Result<Box<Interface>>;
 
+        fn pipeline(self: &mut Interface, sentences: &Vec<String>) -> Vec<InterfaceResult>;
         fn len(self: &InterfaceResult) -> usize;
 
         fn seg(self: &InterfaceResult) -> &Vec<String>;
@@ -30,8 +36,20 @@ mod ffi {
     }
 }
 
-fn ltp_init(path: &CxxString) -> Result<Box<Interface>> {
-    return Ok(Box::new(Interface(LTP::new(&path.to_string())?)));
+fn ltp_init(path: &CxxString, num_threads: i32) -> Result<Box<Interface>> {
+    return Ok(Box::new(Interface(LTP::new(
+        &path.to_string(),
+        num_threads as i16,
+    )?)));
+}
+
+#[cfg(feature = "cuda")]
+pub fn ltp_init_cuda(path: &CxxString, num_threads: i32, device_id: i32) -> Result<Box<Interface>> {
+    return Ok(Box::new(Interface(LTP::new_with_cuda(
+        &path.to_string(),
+        num_threads as i16,
+        device_id,
+    )?)));
 }
 
 impl Interface {
@@ -95,7 +113,7 @@ mod tests {
 
     #[test]
     fn test_interface() {
-        let_cxx_string!(path = "onnx-small");
-        let interface = ltp_init(&*path);
+        let_cxx_string!(path = "models/small");
+        let interface = ltp_init(&*path, 1);
     }
 }

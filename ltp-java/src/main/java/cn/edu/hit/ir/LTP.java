@@ -37,8 +37,8 @@ public class LTP {
     // 指向底层对象的指针，伪装成Java的long
     private final long ptr;
 
-    public LTP(String path) throws Exception {
-        ptr = rust_init(path);
+    public LTP(String path, int num_threads, int device_id) throws Exception {
+        ptr = rust_init(path, num_threads, device_id);
     }
 
     // 在finalize里释放
@@ -54,7 +54,7 @@ public class LTP {
     public static void main(String[] args) {
         LTP ltp = null;
         try {
-            ltp = new LTP("onnx-small");
+            ltp = new LTP("models/small", 1, 0);
             ArrayList<String> inputs = new ArrayList<>();
             inputs.add("他叫汤姆去拿外衣！");
             List output = ltp.pipeline(inputs);
@@ -64,7 +64,7 @@ public class LTP {
         }
     }
 
-    private static native long rust_init(String path) throws Exception;
+    private static native long rust_init(String path, int num_threads, int device_id) throws Exception;
 
     private static native void rust_release(long ptr);
 

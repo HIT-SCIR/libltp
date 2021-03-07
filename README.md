@@ -19,9 +19,8 @@ make
 ## Java
 
 ```shell
-cd ltp-java
-make
-gradle build
+cd ltp-java/rust && make
+cd .. && gradle build
 ```
 
 ## Python
@@ -32,7 +31,7 @@ maturin build -i python3
 ```
 
 ## TODO
-+ [] 可选任务
-+ [] 语言词语对齐
-+ [] 其他语言支持 cuda
-+ [] 自动下载模型
++ [ ] 可选任务
++ [ ] 语言词语对齐
++ [x] 其他语言支持 cuda
++ [ ] 自动下载模型

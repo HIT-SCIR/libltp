@@ -5,6 +5,7 @@ use jni::{
     JNIEnv,
 };
 
+use jni::sys::jint;
 use ltp_rs::{
     preinclude::thiserror::{self, Error},
     LTPError, LTP as Interface,
@@ -44,9 +45,23 @@ where
     Ok(result)
 }
 
-fn ltp_rust_init(env: JNIEnv, _class: JClass, path: JString) -> Result<jlong> {
+fn ltp_rust_init(
+    env: JNIEnv,
+    _class: JClass,
+    path: JString,
+    num_threads: jint,
+    device_id: jint,
+) -> Result<jlong> {
     let path: String = env.get_string(path)?.into();
-    let interface = Box::new(Interface::new(&path)?);
+
+    #[cfg(feature = "cuda")]
+    let interface = if device_id >= 0 {
+        Box::new(Interface::new_with_cuda(&path, num_threads as i16, n)?)
+    } else {
+        Box::new(Interface::new(&path, num_threads as i16)?)
+    };
+    #[cfg(not(feature = "cuda"))]
+    let interface = Box::new(Interface::new(&path, num_threads as i16)?);
     Ok(Box::into_raw(interface) as jlong)
 }
 
@@ -145,8 +160,10 @@ pub extern "system" fn Java_cn_edu_hit_ir_LTP_rust_1init(
     env: JNIEnv,
     _class: JClass,
     path: JString,
+    num_threads: jint,
+    device_id: jint,
 ) -> jlong {
-    let result = ltp_rust_init(env, _class, path);
+    let result = ltp_rust_init(env, _class, path, num_threads, device_id);
 
     match result {
         Ok(res) => res,
@@ -236,8 +253,8 @@ mod tests {
             .add(JObject::from(jstring))
             .expect("list add object error");
 
-        let jstring = env.new_string("../../onnx-small")?;
-        let ptr = Java_cn_edu_hit_ir_LTP_rust_1init(env, jclass, jstring);
+        let jstring = env.new_string("models/small")?;
+        let ptr = Java_cn_edu_hit_ir_LTP_rust_1init(env, jclass, jstring, 16, 0);
         Java_cn_edu_hit_ir_LTP_rust_1pipeline(env, jclass, ptr, jobject);
         Java_cn_edu_hit_ir_LTP_rust_1release(env, jclass, ptr);
 

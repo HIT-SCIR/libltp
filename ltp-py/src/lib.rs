@@ -50,9 +50,18 @@ impl From<PyO3LTPError> for PyErr {
 #[pymethods]
 impl LTP {
     #[new]
-    fn new(path: &PyUnicode) -> PyResult<Self> {
-        let interface =
-            Interface::new(&path.to_string()).map_err(|e| PyO3LTPError::from(LTPError::from(e)))?;
+    #[args(num_threads = 1, device_id = "None")]
+    fn new(path: &PyUnicode, num_threads: i32, device_id: Option<i32>) -> PyResult<Self> {
+        #[cfg(feature = "cuda")]
+        let interface = match device_id {
+            None => Interface::new(&path.to_string(), num_threads as i16)
+                .map_err(|e| PyO3LTPError::from(LTPError::from(e)))?,
+            Some(n) => Interface::new_with_cuda(&path.to_string(), num_threads as i16, n)
+                .map_err(|e| PyO3LTPError::from(LTPError::from(e)))?,
+        };
+        #[cfg(not(feature = "cuda"))]
+        let interface = Interface::new(&path.to_string(), num_threads as i16)
+            .map_err(|e| PyO3LTPError::from(LTPError::from(e)))?;
         Ok(LTP {
             interface: Arc::new(Mutex::new(interface)),
         })

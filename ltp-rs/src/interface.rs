@@ -69,8 +69,17 @@ macro_rules! option_vec_to_vec_option {
 }
 
 impl LTP {
-    pub fn new<S: AsRef<OsStr> + ?Sized>(path: &S) -> Result<LTP> {
-        LTP::new_with_options(path, GraphOptimizationLevel::All, 1)
+    pub fn new<S: AsRef<OsStr> + ?Sized>(path: &S, num_threads: i16) -> Result<LTP> {
+        LTP::new_with_options(path, GraphOptimizationLevel::All, num_threads)
+    }
+
+    #[cfg(feature = "cuda")]
+    pub fn new_with_cuda<S: AsRef<OsStr> + ?Sized>(
+        path: &S,
+        num_threads: i16,
+        device_id: i32,
+    ) -> Result<LTP> {
+        LTP::new_with_cuda_options(path, GraphOptimizationLevel::All, num_threads, device_id)
     }
 
     pub fn new_with_options<S: AsRef<OsStr> + ?Sized>(
@@ -453,8 +462,8 @@ mod tests {
 
     #[test]
     fn test_interface() -> Result<(), LTPError> {
-        let path = String::from("../onnx-small");
-        let mut ltp = LTP::new(&path)?;
+        let path = String::from("models/small");
+        let mut ltp = LTP::new(&path, 1)?;
 
         let sentence = String::from("他叫汤姆去拿外衣。");
         let result = ltp.pipeline(&sentence)?;

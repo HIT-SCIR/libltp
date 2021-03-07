@@ -2,7 +2,7 @@ from pyltp import LTP
 
 
 def main():
-    ltp = LTP("../../onnx-small")
+    ltp = LTP("models/small")
 
     sentences = ["他叫汤姆去拿外衣！", "我爱赛尔！"]
     result = ltp.pipeline(sentences)

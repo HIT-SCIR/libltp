@@ -12,3 +12,6 @@ crate-type = ["cdylib"]
 ltp-rs = { version = '0.1.0', path = '../../ltp-rs' }
 jni = { version = "0.18", features = ["invocation"] }
 
+[features]
+default = []
+cuda = ["ltp-rs/cuda"]

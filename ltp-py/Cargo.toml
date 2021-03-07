@@ -11,3 +11,7 @@ crate-type = ["cdylib"]
 [dependencies]
 ltp-rs = { version = '0.1.0', path = '../ltp-rs' }
 pyo3 = { version = "0.13", features = ["default", "extension-module"] }
+
+[features]
+default = []
+cuda = ["ltp-rs/cuda"]

@@ -14,3 +14,7 @@ ltp-rs = { version = '0.1.0', path = '../../ltp-rs' }
 
 [build-dependencies]
 cxx-build = "1.0"
+
+[features]
+default = []
+cuda = ["ltp-rs/cuda"]
