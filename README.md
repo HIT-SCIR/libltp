@@ -19,7 +19,7 @@ make
 ## Java
 
 ```shell
-cd ltp-java/rust && make
+cd ltp-java/rust && make lib
 cd .. && gradle build
 ```
 

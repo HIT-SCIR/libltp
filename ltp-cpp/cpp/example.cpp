@@ -6,7 +6,7 @@ using namespace std;
 // todo argparse
 int main(int argc, char **argv) {
   try {
-    auto ltp = ltp_init("models/small", 1);
+    auto ltp = ltp_init("models/small", 1, 0);
     auto sentences = rust::Vec<rust::String>{"他叫汤姆去拿外衣！"};
     auto results = ltp->pipeline(sentences);
 

@@ -11,14 +11,7 @@ mod ffi {
         type Interface;
         type InterfaceResult;
 
-        fn ltp_init(path: &CxxString, num_threads: i32) -> Result<Box<Interface>>;
-        #[cfg(feature = "cuda")]
-        fn ltp_init_cuda(
-            path: &CxxString,
-            num_threads: i32,
-            device_id: i32,
-        ) -> Result<Box<Interface>>;
-
+        fn ltp_init(path: &CxxString, num_threads: i32, device_id: i32) -> Result<Box<Interface>>;
         fn pipeline(self: &mut Interface, sentences: &Vec<String>) -> Vec<InterfaceResult>;
         fn len(self: &InterfaceResult) -> usize;
 
@@ -36,19 +29,25 @@ mod ffi {
     }
 }
 
-fn ltp_init(path: &CxxString, num_threads: i32) -> Result<Box<Interface>> {
+fn ltp_init(path: &CxxString, num_threads: i32, device_id: i32) -> Result<Box<Interface>> {
+    #[cfg(feature = "cuda")]
+    if device_id > 0 {
+        return Ok(Box::new(Interface(LTP::new_with_cuda(
+            &path.to_string(),
+            num_threads as i16,
+            device_id,
+        )?)));
+    } else {
+        return Ok(Box::new(Interface(LTP::new(
+            &path.to_string(),
+            num_threads as i16,
+        )?)));
+    }
+
+    #[cfg(not(feature = "cuda"))]
     return Ok(Box::new(Interface(LTP::new(
         &path.to_string(),
         num_threads as i16,
-    )?)));
-}
-
-#[cfg(feature = "cuda")]
-pub fn ltp_init_cuda(path: &CxxString, num_threads: i32, device_id: i32) -> Result<Box<Interface>> {
-    return Ok(Box::new(Interface(LTP::new_with_cuda(
-        &path.to_string(),
-        num_threads as i16,
-        device_id,
     )?)));
 }
 

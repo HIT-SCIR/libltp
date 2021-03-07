@@ -54,7 +54,7 @@ public class LTP {
     public static void main(String[] args) {
         LTP ltp = null;
         try {
-            ltp = new LTP("models/small", 1, 0);
+            ltp = new LTP("../models/small", 1, 0);
             ArrayList<String> inputs = new ArrayList<>();
             inputs.add("他叫汤姆去拿外衣！");
             List output = ltp.pipeline(inputs);
