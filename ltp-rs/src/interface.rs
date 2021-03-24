@@ -154,6 +154,13 @@ impl LTP {
         })
     }
 
+    fn pipeline_batch_seg(&mut self) {}
+    fn pipeline_batch_pos(&mut self) {}
+    fn pipeline_batch_ner(&mut self) {}
+    fn pipeline_batch_srl(&mut self) {}
+    fn pipeline_batch_dep(&mut self) {}
+    fn pipeline_batch_sdp(&mut self) {}
+
     // todo: code is too long, need to split and refactor to support different models
     pub fn pipeline_batch(&mut self, sentences: &Vec<String>) -> Result<Vec<LTPResult>> {
         let inputs = sentences
