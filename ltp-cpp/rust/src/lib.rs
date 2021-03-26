@@ -113,6 +113,6 @@ mod tests {
     #[test]
     fn test_interface() {
         let_cxx_string!(path = "models/small");
-        let interface = ltp_init(&*path, 1);
+        let interface = ltp_init(&*path, 1, 0);
     }
 }
