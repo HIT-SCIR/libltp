@@ -1,12 +1,27 @@
 #include <ltp.h>
 #include <cxx.h>
 #include <iostream>
+#include "argparse/argparse.hpp"
 using namespace std;
 
-// todo argparse
 int main(int argc, char **argv) {
+  argparse::ArgumentParser program("ltp");
+
+  program.add_argument("-m", "--model")
+      .required()
+      .help("model path");
+
   try {
-    auto ltp = ltp_init("models/small", 1, 0);
+    program.parse_args(argc, argv);
+  }
+  catch (const std::runtime_error &err) {
+    std::cout << err.what() << std::endl;
+    std::cout << program;
+    exit(0);
+  }
+  auto model_path = program.get<string>("--model");
+  try {
+    auto ltp = ltp_init(model_path, 1, 0);
     auto sentences = rust::Vec<rust::String>{"他叫汤姆去拿外衣！"};
     auto results = ltp->pipeline(sentences);
 

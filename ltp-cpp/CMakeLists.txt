@@ -31,3 +31,7 @@ add_subdirectory(rust)
 add_executable(example cpp/example.cpp)
 target_include_directories(example PUBLIC ${onnxruntime_INCLUDE_DIRS})
 target_link_libraries(example ltp ${onnxruntime_LIBRARIES})
+
+add_executable(tiny cpp/tiny.cpp)
+target_include_directories(tiny PUBLIC ${onnxruntime_INCLUDE_DIRS})
+target_link_libraries(tiny ltp ${onnxruntime_LIBRARIES})
