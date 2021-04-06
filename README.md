@@ -1,6 +1,6 @@
-# libltp<sup>beta</sup>: Language Technology Platform Language Bindings
+# libltp<sup>beta</sup>
 
-本仓库用于为 [ltp](https://github.com/HIT-SCIR/ltp) 创建不同语言的绑定。
+本仓库用于为 [Language Technology Platform](https://github.com/HIT-SCIR/ltp) 创建不同语言的绑定。
 
 + [x] Rust
 + [x] C++
